@@ -1,0 +1,3 @@
+GRANT USAGE ON *.* TO 'slave_read_user'@'%' IDENTIFIED BY '12345678';
+GRANT REPLICATION SLAVE ON *.* TO slave_read_user@'%';
+FLUSH PRIVILEGES;

@@ -1,0 +1,139 @@
+version: '3'
+
+networks:
+  laravel-network:
+    driver: bridge
+
+services:
+
+        laravel:
+            container_name: laravel
+            build:
+                context: ./php-fpm
+                args:
+                    - timezone=${TZ}
+            networks:
+                - laravel-network
+            ports:
+                - "9001:9000"
+            volumes:
+                - ./../laravel:/laravel:rw,cached
+                - laravel_log:/laravel/var/log
+            env_file:
+                - .env
+            depends_on:
+                - redis
+                - memcached
+                - maria-master
+
+        nginx:
+            container_name: nginx
+            build:
+                context: ./nginx
+                args:
+                    - timezone=${TZ}
+            ports:
+                - "81:80"
+                - "443:443"
+            networks:
+                - laravel-network
+            depends_on:
+                - laravel
+            volumes:
+                - ./../laravel/public:/laravel/public
+                - ./nginx/ssl:/etc/nginx/ssl
+                - ./nginx/conf.d:/etc/nginx/conf.d
+                - ./nginx/nginx_log:/var/log/nginx
+                - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+            env_file:
+                - .env
+            command: /bin/bash -c "exec nginx -g 'daemon off;'"
+
+        redis:
+            container_name: redis
+            image: redis:latest
+            networks:
+                - laravel-network
+
+        memcached:
+            container_name: memcached
+            image: memcached:latest
+            networks:
+                - laravel-network
+
+        maria-master:
+            container_name: maria_master
+            image: mariadb:latest
+            env_file:
+                - ./db/master/.env.master
+            volumes:
+                - ./db/master/master.sql:/docker-entrypoint-initdb.d/start.sql
+                - ./db/master/maria.master.cnf:/etc/mysql/conf.d/maria.master.cnf
+                - ./db/master/.data/mysql:/var/lib/mysql:rw
+            ports:
+                - "3305:3306"
+            networks:
+                - laravel-network
+
+        maria-slave-1:
+            container_name: maria_slave_1
+            image: mariadb:latest
+            env_file:
+                - ./db/slaves/email/.env.slave
+            volumes:
+                - ./db/slaves/slave.sql:/docker-entrypoint-initdb.d/start.sql
+                - ./db/slaves/email/maria.slave.cnf:/etc/mysql/conf.d/maria.slave.cnf
+                - ./db/slaves/email/.data/mysql:/var/lib/mysql:rw
+            ports:
+                - "3307:3306"
+            networks:
+                - laravel-network
+
+        maria-slave-2:
+            container_name: maria_slave_2
+            image: mariadb:latest
+            env_file:
+                - ./db/slaves/sms/.env.slave
+            volumes:
+                - ./db/slaves/slave.sql:/docker-entrypoint-initdb.d/start.sql
+                - ./db/slaves/sms/maria.slave.cnf:/etc/mysql/conf.d/maria.slave.cnf
+                - ./db/slaves/sms/.data/mysql:/var/lib/mysql:rw
+            ports:
+                - "3308:3306"
+            networks:
+                - laravel-network
+
+        maria-slave-3:
+            container_name: maria_slave_3
+            image: mariadb:latest
+            env_file:
+                - ./db/slaves/post/.env.slave
+            volumes:
+                - ./db/slaves/slave.sql:/docker-entrypoint-initdb.d/start.sql
+                - ./db/slaves/post/maria.slave.cnf:/etc/mysql/conf.d/maria.slave.cnf
+                - ./db/slaves/post/.data/mysql:/var/lib/mysql:rw
+            ports:
+                - "3309:3306"
+            networks:
+                - laravel-network
+
+        maria-slave-4:
+            container_name: maria_slave_4
+            image: mariadb:latest
+            env_file:
+                - ./db/slaves/text/.env.slave
+            volumes:
+                - ./db/slaves/slave.sql:/docker-entrypoint-initdb.d/start.sql
+                - ./db/slaves/text/maria.slave.cnf:/etc/mysql/conf.d/maria.slave.cnf
+                - ./db/slaves/text/.data/mysql:/var/lib/mysql:rw
+            ports:
+                - "3310:3306"
+            networks:
+                - laravel-network
+
+volumes:
+    nginx_log:
+    laravel_log:
+    db:
+        driver: local
+
