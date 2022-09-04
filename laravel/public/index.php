@@ -1,5 +1,8 @@
 <?php
 
+use App\Sorts\BubbleAbstractSort;
+use App\Sorts\QuickSort;
+use App\Sorts\ShakerSort;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 
@@ -44,6 +47,7 @@ require __DIR__.'/../vendor/autoload.php';
 */
 
 $app = require_once __DIR__.'/../bootstrap/app.php';
+
 
 $kernel = $app->make(Kernel::class);
 
