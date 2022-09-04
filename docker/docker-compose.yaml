@@ -7,15 +7,71 @@ networks:
 services:
 
         laravel:
-            container_name: laravel
+
             build:
                 context: ./php-fpm
                 args:
                     - timezone=${TZ}
             networks:
                 - laravel-network
-            ports:
-                - "9001:9000"
+
+            volumes:
+                - ./../laravel:/laravel:rw,cached
+                - laravel_log:/laravel/var/log
+            env_file:
+                - .env
+            depends_on:
+                - redis
+                - memcached
+                - maria-master
+
+        laravel2:
+
+            build:
+                context: ./php-fpm
+                args:
+                    - timezone=${TZ}
+            networks:
+                - laravel-network
+
+            volumes:
+                - ./../laravel:/laravel:rw,cached
+                - laravel_log:/laravel/var/log
+            env_file:
+                - .env
+            depends_on:
+                - redis
+                - memcached
+                - maria-master
+
+        laravel3:
+
+            build:
+                context: ./php-fpm
+                args:
+                    - timezone=${TZ}
+            networks:
+                - laravel-network
+
+            volumes:
+                - ./../laravel:/laravel:rw,cached
+                - laravel_log:/laravel/var/log
+            env_file:
+                - .env
+            depends_on:
+                - redis
+                - memcached
+                - maria-master
+
+        laravel4:
+
+            build:
+                context: ./php-fpm
+                args:
+                    - timezone=${TZ}
+            networks:
+                - laravel-network
+
             volumes:
                 - ./../laravel:/laravel:rw,cached
                 - laravel_log:/laravel/var/log
