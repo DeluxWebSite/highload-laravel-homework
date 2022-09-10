@@ -187,6 +187,21 @@ services:
             networks:
                 - laravel-network
 
+        rabbit:
+            container_name: rabbitMQ
+            build: ./rabbitMQ
+            ports:
+                - "5672:5672"
+                - "15672:15672"
+            volumes:
+                - ./rabbitMQ/data/mnesia:/var/lib/rabbitmq/mnesia
+                - ./rabbitMQ/log/:/var/log/rabbit:rw
+                - ./rabbitMQ/init.sh:/init.sh
+            hostname: rabbitMQ
+            networks:
+                - laravel-network
+
+
 volumes:
     nginx_log:
     laravel_log:
