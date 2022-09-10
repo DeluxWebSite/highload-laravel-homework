@@ -7,15 +7,71 @@ networks:
 services:
 
         laravel:
-            container_name: laravel
+
             build:
                 context: ./php-fpm
                 args:
                     - timezone=${TZ}
             networks:
                 - laravel-network
-            ports:
-                - "9001:9000"
+
+            volumes:
+                - ./../laravel:/laravel:rw,cached
+                - laravel_log:/laravel/var/log
+            env_file:
+                - .env
+            depends_on:
+                - redis
+                - memcached
+                - maria-master
+
+        laravel2:
+
+            build:
+                context: ./php-fpm
+                args:
+                    - timezone=${TZ}
+            networks:
+                - laravel-network
+
+            volumes:
+                - ./../laravel:/laravel:rw,cached
+                - laravel_log:/laravel/var/log
+            env_file:
+                - .env
+            depends_on:
+                - redis
+                - memcached
+                - maria-master
+
+        laravel3:
+
+            build:
+                context: ./php-fpm
+                args:
+                    - timezone=${TZ}
+            networks:
+                - laravel-network
+
+            volumes:
+                - ./../laravel:/laravel:rw,cached
+                - laravel_log:/laravel/var/log
+            env_file:
+                - .env
+            depends_on:
+                - redis
+                - memcached
+                - maria-master
+
+        laravel4:
+
+            build:
+                context: ./php-fpm
+                args:
+                    - timezone=${TZ}
+            networks:
+                - laravel-network
+
             volumes:
                 - ./../laravel:/laravel:rw,cached
                 - laravel_log:/laravel/var/log
@@ -130,6 +186,21 @@ services:
                 - "3310:3306"
             networks:
                 - laravel-network
+
+        rabbit:
+            container_name: rabbitMQ
+            build: ./rabbitMQ
+            ports:
+                - "5672:5672"
+                - "15672:15672"
+            volumes:
+                - ./rabbitMQ/data/mnesia:/var/lib/rabbitmq/mnesia
+                - ./rabbitMQ/log/:/var/log/rabbit:rw
+                - ./rabbitMQ/init.sh:/init.sh
+            hostname: rabbitMQ
+            networks:
+                - laravel-network
+
 
 volumes:
     nginx_log:

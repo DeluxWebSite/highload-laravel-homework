@@ -1,0 +1,1 @@
+docker-compose up -d  --scale laravel=5 --scale laravel2=3 --scale laravel3=5 --scale laravel4=4
